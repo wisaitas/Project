@@ -1,15 +1,15 @@
-import csv
+# import csv
 
-time = [[6,7,8,9,10],[0,2,3,4,5]]
-f = open('test.csv','w')
-for t in time:
-    for i in range(len(t)):
-        if i == 0:
-            f.write(str(t[i]))
-        else:
-            f.write(','+str(t[i]))
-    f.write('\n')
-f.close()
+# time = [[6,7,8,9,10],[0,2,3,4,5]]
+# f = open('test.csv','w')
+# for t in time:
+#     for i in range(len(t)):
+#         if i == 0:
+#             f.write(str(t[i]))
+#         else:
+#             f.write(','+str(t[i]))
+#     f.write('\n')
+# f.close()
 
     
 
@@ -24,3 +24,10 @@ f.close()
 #             f.write(',' + str(item[i]))
 #     f.write('\n')
 # f.close()
+
+f = open('test.csv','w')
+for i in range(100):
+    i = i + 1
+    f.write(str(i)+' ')
+    for i in range(2):
+        f.write('test')

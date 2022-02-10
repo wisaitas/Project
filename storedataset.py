@@ -213,8 +213,28 @@ print(percentcorrect)
 
 # Write Dateset
 f = open('signal.csv','w')
-for i in range(time):
-    f.write(str(i)+' ')
+# for ti in range(time):
+#     ti = ti +1 
+#     countline = 0
+#     f.write(str(ti)+' ')
+#     for item in complextransigplussir:
+#         for i in range(len(item)):
+#             f.write(str(item[i])+' ')
+#         countline = countline + 1
+countgroupdata = 0
+# for ti in range(time):
+#     ti = ti + 1
+#     f.write(str(ti)+' ')
+#     for i in range(amountsignal):
+#         for i in range(len(complextransigplussir[0])):
+#             f.write(str(complextransigplussir[countgroupdata][i])+' ')
+#         countgroupdata = countgroupdata + 1
+#     f.write('\n\n\n\n\n')
+for i in range(amountsignal):
+    for i in range(len(complextransigplussir[0])):
+        f.write(str(complextransigplussir[countgroupdata][i])+' ')
+    countgroupdata = countgroupdata + 1
+    f.write('\n\n\n')
 
 fig,myplot = plt.subplots(5, 1)
 myplot[0].plot(t,allsig[0])
