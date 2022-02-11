@@ -1,5 +1,5 @@
 # import csv
-
+import math
 # time = [[6,7,8,9,10],[0,2,3,4,5]]
 # f = open('test.csv','w')
 # for t in time:
@@ -25,9 +25,5 @@
 #     f.write('\n')
 # f.close()
 
-f = open('test.csv','w')
-for i in range(100):
-    i = i + 1
-    f.write(str(i)+' ')
-    for i in range(2):
-        f.write('test')
+num = 0.47
+print(math.ceil(num))
