@@ -4,6 +4,7 @@ import random
 import math
 import statistics
 import csv
+import pandas as pd
 
 Ptdevice = [5*(10**-3),70*(10**-3),150*(10**-3)]
 SIR = []
@@ -160,7 +161,14 @@ for item in allsig:
 print('------Transmited Signal Complete------')
 
 # Pattern SIR dbm + complextransig
-SIRpattern = [0,5,10,15,20,25,30]
+SIRpattern = []
+pattern = 0
+for i in range(7):
+    if len(SIRpattern) < 100:
+        SIRpattern.append(pattern)
+        pattern = pattern + 5
+    else:
+        break
 complextransigplussir = []
 for sir in SIRpattern:
     for item in complextransig:
@@ -209,20 +217,28 @@ for item in demodtransmited:
     amountsignalcorrect = amountsignalcorrect + 1
     calcorrect.append((countcorrect / len(item))*100)
     percentcorrect.append(calcorrect)
-print(percentcorrect)
+# print(percentcorrect)
 
 # Write Dateset
-f = open('signal.csv','w')
-countgroupdata = 0
-timedataset = 1
-while countgroupdata < len(complextransigplussir):
-    f.write('Time = '+str(timedataset)+' ')
-    for a in range(amountsignal):
-        for i in range(len(complextransigplussir[0])):
-            f.write(str(complextransigplussir[countgroupdata][i])+' ')
-        countgroupdata = countgroupdata + 1
-    f.write('\n\n\n')
-    timdataset = timedataset + 1
+time_df = []
+for i in range(100):
+    i = i+1
+    time_df.append(['t={}'.format(i)])
+df = []
+dfcon = []
+indcol = 0
+for i in range(len(complextransigplussir)):
+    if i%amountsignal == 0 and i == 0:
+        df.append(pd.DataFrame(complextransigplussir[i],columns=time_df[indcol]))
+    elif i%amountsignal == 0 and i != 0:
+        indcol = indcol + 1
+        df.append(pd.DataFrame(complextransigplussir[i],columns=time_df[indcol]))
+    else:
+        df.append(pd.DataFrame(complextransigplussir[i],columns=time_df[indcol]))
+for i in range(len(df)):
+    dfcon.append(df[i])
+condf = pd.concat(dfcon,axis=1)
+condf.to_csv('signal_dataset.csv')
 
 fig,myplot = plt.subplots(5, 1)
 myplot[0].plot(t,allsig[0])
