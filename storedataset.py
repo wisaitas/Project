@@ -238,7 +238,10 @@ for i in range(len(complextransigplussir)):
 for i in range(len(df)):
     dfcon.append(df[i])
 condf = pd.concat(dfcon,axis=1)
-condf.to_csv('signal_dataset.csv')
+# condf.to_csv('signal_dataset.csv')
+
+# Write Label
+pd.Series(np.array(allsig).reshape(-1).astype(np.uint8)).to_csv('labels2.csv', index=False)
 
 fig,myplot = plt.subplots(5, 1)
 myplot[0].plot(t,allsig[0])
@@ -257,7 +260,7 @@ myplot[3].plot(t,demodtransmited[0])
 myplot[3].set_xlabel('Time')
 myplot[3].set_ylabel('Amplitude')
 
-myplot[4].plot(t,sig)
+myplot[4].plot(t,complextransigplussir[0])
 myplot[4].set_xlabel('Time')
 myplot[4].set_ylabel('Amplitude')
 plt.show()
