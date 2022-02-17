@@ -4,7 +4,7 @@ import random
 import math
 import statistics
 import csv
-import time as timer
+# import time as timer
 import pandas as pd
 
 Ptdevice = [5*(10**-3),70*(10**-3),150*(10**-3)]
@@ -130,7 +130,7 @@ for i in range(100):
 # Random Binary Signal
 print('Random Binary : ',end='')
 allsig = []
-amountsignal = 100
+amountsignal = 4
 i = 0
 j = 0
 for s in range(amountsignal):
@@ -151,7 +151,6 @@ for s in range(amountsignal):
     i = 0
     allsig.append(ranbisig)
 print('Success \n')
-timer.sleep(1)
 
 # Random Binary i(t)
 it = []
@@ -190,7 +189,6 @@ for item in allsig:
         calcomplex.append(item[i]*z[i] + noise[i] + SNRall[i] + it[i])
     complextransig.append(calcomplex)
 print('Success \n')
-timer.sleep(1)
 
 # Pattern SIR dbm + complextransig
 print('SIR Pattern : ',end='')
@@ -212,7 +210,7 @@ for sir in SIRpattern:
 print('Success \n')
 
 
-# Demod ask to Transmited Signal
+# No Suppression 
 print('No Suppression Percent : ',end= '')
 complextransigtoask = []
 for item in complextransig:
@@ -237,21 +235,59 @@ for item in demodtransmited:
             demodtransmited[countdemod][w1] = 1
         w1 = w1+1
     countdemod = countdemod + 1
-
-# Compare Transmited Sigmal before after demod
-amountsignalcorrect = 0
-percentcorrect = []
+amountsignalcorrectnsp = 0
+percentcorrectnsp = []
 for item in demodtransmited:
-    calcorrect = []
     countcorrect = 0
     for i in range(len(item)):
-        if allsig[amountsignalcorrect][i] == demodtransmited[amountsignalcorrect][i]:
+        if allsig[amountsignalcorrectnsp][i] == demodtransmited[amountsignalcorrectnsp][i]:
             countcorrect = countcorrect + 1
-    amountsignalcorrect = amountsignalcorrect + 1
-    calcorrect.append((countcorrect / len(item))*100)
-    percentcorrect.append(calcorrect)
+    amountsignalcorrectnsp = amountsignalcorrectnsp + 1
+    percentcorrectnsp.append(countcorrect / len(item)*100)
 print('Success \n')
-timer.sleep(1)
+
+# MMSE
+demodfortransmited = []
+for item in complextransigplussir:
+    caltrantoask = []
+    for i in range(len(item)):
+        caltrantoask.append(item[i]/z[i])
+    demodfortransmited.append(caltrantoask)
+demodformmse = []
+for item in demodfortransmited:
+    caldemod = []
+    for i in range(len(item)):
+        if abs(item[i]) <= abs(statistics.mean(item))/1.5:
+            caldemod.append(0)
+        else:
+            caldemod.append(1)
+    demodformmse.append(caldemod)
+countdemod = 0
+for item in demodformmse:
+    w1 = 1
+    while w1 < len(item)-1:
+        if item[w1-1] == 1 and item[w1+1] == 1 :
+            demodformmse[countdemod][w1] = 1
+        w1 = w1+1
+    countdemod = countdemod + 1
+amountsignalcorrectmmse = 0
+percentcorrectmmse = []
+for item in demodformmse:
+    countcorrect = 0
+    amountsignaltmpmmse = 0
+    for i in range(len(item)):
+        if amountsignaltmpmmse != amountsignal:
+            if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
+                countcorrect = countcorrect + 1
+        else:
+            amountsignaltmpmmse = 0
+            if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
+                countcorrect = countcorrect + 1
+    amountsignaltmpmmse = amountsignaltmpmmse + 1
+    amountsignalcorrectmmse = amountsignalcorrectmmse + 1
+    percentcorrectmmse.append((countcorrect / len(item))*100)
+print(percentcorrectnsp)
+print(statistics.mean(percentcorrectmmse))
 
 # Write Dateset
 print('Write Dataset and Labels : ',end='')
@@ -278,10 +314,6 @@ condf.to_csv('signal_dataset.csv')
 # Write Label
 pd.Series(np.array(allsig).reshape(-1).astype(np.uint8)).to_csv('labels.csv', index=False)
 print('Success \n')
-timer.sleep(1)
-
-
-plt.show()
 
 if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefarm == "Normal":
     # plt.plot(linex,liney,label='Area',color='red')
@@ -295,23 +327,22 @@ if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefar
     # plt.xlabel('Meter')
     # plt.ylabel('Meter')
     # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower right',ncol=2, borderaxespad=0.)
-    # fig,myplot = plt.subplots(4, 1)
-    # myplot[0].plot(t,allsig[0])
-    # myplot[0].set_xlabel('Time')
-    # myplot[0].set_ylabel('Amplitude')
+    fig,myplot = plt.subplots(4, 1)
+    myplot[0].plot(t,allsig[0])
+    myplot[0].set_xlabel('Time')
+    myplot[0].set_ylabel('Amplitude')
 
-    # myplot[1].plot(t,complextransig[0])
-    # myplot[1].set_xlabel('Time')
-    # myplot[1].set_ylabel('Amplitude')
+    myplot[1].plot(t,complextransig[0])
+    myplot[1].set_xlabel('Time')
+    myplot[1].set_ylabel('Amplitude')
 
-    # myplot[2].plot(t,demodtransmited[0])
-    # myplot[2].set_xlabel('Time')
-    # myplot[2].set_ylabel('Amplitude')
+    myplot[2].plot(t,demodtransmited[0])
+    myplot[2].set_xlabel('Time')
+    myplot[2].set_ylabel('Amplitude')
 
-    # myplot[3].plot(t,complextransigplussir[0])
-    # myplot[3].set_xlabel('Time')
-    # myplot[3].set_ylabel('Amplitude')
-    # plt.show()
-    print('All Running Success')
+    myplot[3].plot(t,complextransigplussir[20])
+    myplot[3].set_xlabel('Time')
+    myplot[3].set_ylabel('Amplitude')
+    plt.show()
 else:
     print('End Process')
