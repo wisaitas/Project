@@ -1,4 +1,3 @@
-from distutils.command.sdist import sdist
 from tabnanny import verbose
 import numpy as np
 import pandas as pd
@@ -8,10 +7,8 @@ from sklearn.svm import SVC as SVC
 df = pd.read_csv('signal_dataset.csv',header=None)
 labels = pd.read_csv('labels.csv')
 labels = labels['0']
-# print(df)
 df = df.drop([0],axis=0)
 df = df.drop(columns=[0],axis=1)
-print(df)
 tmp = []
 n = 100 # amount signal 
 s = 700 # amount SIR * amount signal
@@ -26,20 +23,28 @@ df = df.astype(float)
 df = df[0]
 df = (df - df.min()) / (df.max() - df.min())
 dft = [df.copy()]
-nt = 10
+nt = 80
 for i in range(nt):
     dft.append(df.shift(i+1))
-# print(df, df.shift(1))
 dft = pd.concat(dft, axis=1)
 dft = dft.iloc[nt:]
 labels = labels.iloc[nt:]
 clf = SVC(kernel='rbf')
-# print(df.shape, labels.shape)
-clf.fit(dft, labels)
+clf.fit(dft,labels)
 pred = clf.predict(dft)
 acc = accuracy_score(labels, pred)
-print(acc)
-# print(confusion_matrix(labels, pred))
+print('svm accuracy : ',acc*100)
+print(confusion_matrix(labels, pred))
+
+
+
+
+
+
+
+
+
+
 # print('--------'*10)
 # thresh = (df.iloc[nt:] > 0.5).astype(np.uint8)
 # print(accuracy_score(labels, thresh))
