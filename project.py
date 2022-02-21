@@ -39,7 +39,7 @@ noise = np.random.normal(0,1,len(t)) # AWGN Noise
 sig = a*np.sin(2*np.pi*f*t) # Signal Carrier Sine Wave
 
 # Simulation Farm
-sizefarm = 'normal' 
+sizefarm = 'large' 
 # sizefarm = input("Size farm [normal,large] : ") 
 if sizefarm == "normal" or sizefarm == "Normal":
     tree = 700
@@ -181,12 +181,14 @@ for item in allsig:
 
 complextransig = []
 z=[]
+meannoise = statistics.mean(noise)
+meanSNRall = statistics.mean(SNRall)
 for item in allsig:
     calcomplex = []
     for i in range(len(item)):
         h = 1/math.sqrt(2)*(random.randint(1,len(t))+1j*random.randint(1,len(t)))
         z.append(math.sqrt(h.real**2 + h.imag**2))
-        calcomplex.append(item[i]*z[i] + noise[i] + SNRall[i] + it[i])
+        calcomplex.append(item[i]*z[i] + meannoise + meanSNRall + it[i])
     complextransig.append(calcomplex)
 print('Success \n')
 
@@ -211,83 +213,84 @@ print('Success \n')
 
 
 # No Suppression 
-print('No Suppression Percent : ',end= '')
-complextransigtoask = []
-for item in complextransig:
-    caltrantoask = []
-    for i in range(len(item)):
-        caltrantoask.append(item[i]/z[i])
-    complextransigtoask.append(caltrantoask)
-demodtransmited = []
-for item in complextransigtoask:
-    caldemod = []
-    for i in range(len(item)):
-        if abs(item[i]) <= abs(statistics.mean(item))/2:
-            caldemod.append(0)
-        else:
-            caldemod.append(1)
-    demodtransmited.append(caldemod)
-countdemod = 0
-for item in demodtransmited:
-    w1 = 1
-    while w1 < len(item)-1:
-        if item[w1-1] == 1 and item[w1+1] == 1:
-            demodtransmited[countdemod][w1] = 1
-        w1 = w1+1
-    countdemod = countdemod + 1
-amountsignalcorrectnsp = 0
-percentcorrectnsp = []
-for item in demodtransmited:
-    countcorrect = 0
-    for i in range(len(item)):
-        if allsig[amountsignalcorrectnsp][i] == demodtransmited[amountsignalcorrectnsp][i]:
-            countcorrect = countcorrect + 1
-    amountsignalcorrectnsp = amountsignalcorrectnsp + 1
-    percentcorrectnsp.append(countcorrect / len(item)*100)
-print('Success \n')
+# print('No Suppression Percent : ',end= '')
+# complextransigtoask = []
+# for item in complextransig:
+#     caltrantoask = []
+#     for i in range(len(item)):
+#         caltrantoask.append(item[i]/z[i])
+#     complextransigtoask.append(caltrantoask)
+# demodtransmited = []
+# for item in complextransigtoask:
+#     caldemod = []
+#     for i in range(len(item)):
+#         if abs(item[i]) <= abs(statistics.mean(item))/2:
+#             caldemod.append(0)
+#         else:
+#             caldemod.append(1)
+#     demodtransmited.append(caldemod)
+# countdemod = 0
+# for item in demodtransmited:
+#     w1 = 1
+#     while w1 < len(item)-1:
+#         if item[w1-1] == 1 and item[w1+1] == 1:
+#             demodtransmited[countdemod][w1] = 1
+#         w1 = w1+1
+#     countdemod = countdemod + 1
+# amountsignalcorrectnsp = 0
+# percentcorrectnsp = []
+# for item in demodtransmited:
+#     countcorrect = 0
+#     for i in range(len(item)):
+#         if allsig[amountsignalcorrectnsp][i] == demodtransmited[amountsignalcorrectnsp][i]:
+#             countcorrect = countcorrect + 1
+#     amountsignalcorrectnsp = amountsignalcorrectnsp + 1
+#     percentcorrectnsp.append(countcorrect / len(item)*100)
+# print('Success \n')
 
 # MMSE
-demodfortransmited = []
-for item in complextransigplussir:
-    caltrantoask = []
-    for i in range(len(item)):
-        caltrantoask.append(item[i]/z[i])
-    demodfortransmited.append(caltrantoask)
-demodformmse = []
-for item in demodfortransmited:
-    caldemod = []
-    for i in range(len(item)):
-        if abs(item[i]) <= abs(statistics.mean(item))/1.5:
-            caldemod.append(0)
-        else:
-            caldemod.append(1)
-    demodformmse.append(caldemod)
-countdemod = 0
-for item in demodformmse:
-    w1 = 1
-    while w1 < len(item)-1:
-        if item[w1-1] == 1 and item[w1+1] == 1 :
-            demodformmse[countdemod][w1] = 1
-        w1 = w1+1
-    countdemod = countdemod + 1
-amountsignalcorrectmmse = 0
-percentcorrectmmse = []
-for item in demodformmse:
-    countcorrect = 0
-    amountsignaltmpmmse = 0
-    for i in range(len(item)):
-        if amountsignaltmpmmse != amountsignal:
-            if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
-                countcorrect = countcorrect + 1
-        else:
-            amountsignaltmpmmse = 0
-            if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
-                countcorrect = countcorrect + 1
-    amountsignaltmpmmse = amountsignaltmpmmse + 1
-    amountsignalcorrectmmse = amountsignalcorrectmmse + 1
-    percentcorrectmmse.append((countcorrect / len(item))*100)
-print(percentcorrectnsp)
-print(statistics.mean(percentcorrectmmse))
+# print('MMSE : ',end='')
+# demodfortransmited = []
+# for item in complextransigplussir:
+#     caltrantoask = []
+#     for i in range(len(item)):
+#         caltrantoask.append(item[i]/z[i])
+#     demodfortransmited.append(caltrantoask)
+# demodformmse = []
+# for item in demodfortransmited:
+#     caldemod = []
+#     for i in range(len(item)):
+#         if abs(item[i]) <= abs(statistics.mean(item))/1.5:
+#             caldemod.append(0)
+#         else:
+#             caldemod.append(1)
+#     demodformmse.append(caldemod)
+# countdemod = 0
+# for item in demodformmse:
+#     w1 = 1
+#     while w1 < len(item)-1:
+#         if item[w1-1] == 1 and item[w1+1] == 1 :
+#             demodformmse[countdemod][w1] = 1
+#         w1 = w1+1
+#     countdemod = countdemod + 1
+# amountsignalcorrectmmse = 0
+# percentcorrectmmse = []
+# for item in demodformmse:
+#     countcorrect = 0
+#     amountsignaltmpmmse = 0
+#     for i in range(len(item)):
+#         if amountsignaltmpmmse != amountsignal:
+#             if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
+#                 countcorrect = countcorrect + 1
+#         else:
+#             amountsignaltmpmmse = 0
+#             if allsig[amountsignaltmpmmse][i] == demodformmse[amountsignalcorrectmmse][i]:
+#                 countcorrect = countcorrect + 1
+#     amountsignaltmpmmse = amountsignaltmpmmse + 1
+#     amountsignalcorrectmmse = amountsignalcorrectmmse + 1
+#     percentcorrectmmse.append((countcorrect / len(item))*100)
+# print('Success \n')
+# print(statistics.mean(percentcorrectmmse))
 
 # Write Dateset
 print('Write Dataset and Labels : ',end='')
@@ -336,9 +339,9 @@ if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefar
     myplot[1].set_xlabel('Time')
     myplot[1].set_ylabel('Amplitude')
 
-    myplot[2].plot(t,demodtransmited[0])
-    myplot[2].set_xlabel('Time')
-    myplot[2].set_ylabel('Amplitude')
+    # myplot[2].plot(t,demodtransmited[0])
+    # myplot[2].set_xlabel('Time')
+    # myplot[2].set_ylabel('Amplitude')
 
     myplot[3].plot(t,complextransigplussir[20])
     myplot[3].set_xlabel('Time')
