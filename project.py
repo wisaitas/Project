@@ -130,7 +130,7 @@ for i in range(100):
 # Random Binary Signal
 print('Random Binary : ',end='')
 allsig = []
-amountsignal = 4
+amountsignal = 3
 i = 0
 j = 0
 for s in range(amountsignal):
@@ -343,7 +343,7 @@ if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefar
     # myplot[2].set_xlabel('Time')
     # myplot[2].set_ylabel('Amplitude')
 
-    myplot[3].plot(t,complextransigplussir[20])
+    myplot[3].plot(t,complextransigplussir[0])
     myplot[3].set_xlabel('Time')
     myplot[3].set_ylabel('Amplitude')
     plt.show()
