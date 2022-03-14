@@ -1,18 +1,19 @@
-from tabnanny import verbose
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.svm import SVC as SVC,SVR
 from sklearn import metrics
 import matplotlib.pyplot as plt
+from datetime import datetime
 
+print('Start Time : ',datetime.now())
 df = pd.read_csv('signal_dataset.csv',header=None)
 labels = pd.read_csv('labels.csv')
 labels = labels['0']
 df = df.drop([0],axis=0)
 df = df.drop(columns=[0],axis=1)
 tmp = []
-n = 3 # amount signal 
+n = 30 # amount signal 
 s = 7*n # 7 * amount signal
 for i in range(1, s, n):
     arr = df[np.arange(i, i+n)].to_numpy()
@@ -44,39 +45,53 @@ labels = labels.iloc[nt:]
 # pred_labelmmse = predmmse > 0.5
 # print('mmse success')
 
-# clfrbf = SVR(kernel='rbf')
-# clfrbf.fit(dft,labels)
-# predrbf = clfrbf.predict(dft)
-# fprrbf,tprrbf, _2 = metrics.roc_curve(labels,predrbf)
-# pred_labelrbf = predrbf > 0.5
-# print('rbf success')
+clfrbf = SVR(kernel='poly',degree=2)
+clfrbf.fit(dft,labels)
+predrbf = clfrbf.predict(dft)
+fprrbf,tprrbf, _2 = metrics.roc_curve(labels,predrbf)
+pred_labelrbf = predrbf > 0.5
+print(metrics.auc(fprrbf,tprrbf))
+print('rbf success : ',datetime.now())
 
-# clfpoly2 = SVR(kernel='poly',degree = 30)
+# clfpoly2 = SVR(kernel='poly',degree = 2)
 # clfpoly2.fit(dft,labels)
 # predpoly2 = clfpoly2.predict(dft)
 # fprpoly2,tprpoly2, _2 = metrics.roc_curve(labels,predpoly2)
 # pred_labelpoly2 = predpoly2> 0.5
 # print('poly degree 2 success')
 
-clfpoly = SVR(kernel='poly',degree = 90)
+clfpoly = SVR(kernel='poly',degree = 3)
 clfpoly.fit(dft,labels)
 predpoly = clfpoly.predict(dft)
 fprpoly,tprpoly, _2 = metrics.roc_curve(labels,predpoly)
 pred_labelpoly = predpoly > 0.5
-print('poly degree 3 success')
+print(metrics.auc(fprpoly,tprpoly))
+print('poly degree 3 success : ',datetime.now())
 
 
-# clfpoly4 = SVR(kernel='poly',degree = 40)
+# clfpoly4 = SVR(kernel='poly',degree = 4)
 # clfpoly4.fit(dft,labels)
 # predpoly4 = clfpoly4.predict(dft)
 # fprpoly4,tprpoly4, _2 = metrics.roc_curve(labels,predpoly4)
 # pred_labelpoly4 = predpoly4 > 0.5
 # print('poly degree 4 success')
 
+# plt.plot(fpr,tpr,color='red',label='linear')
+# plt.plot(fprmmse,tprmmse,color='blue',label='mmse ')
+plt.plot(fprrbf,tprrbf,color='c',label='poly degree 2')
+# plt.plot(fprpoly2,tprpoly2,color='m',label='poly degree 2')
+plt.plot(fprpoly,tprpoly,color='green',label='poly degree 3')
+# plt.plot(fprpoly4,tprpoly4,color='y',label='poly degree 4')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.legend()
+plt.show()
+
 # acc = accuracy_score('acc linear : ',labels, pred)
 # accmmse = accuracy_score('acc mmse : ',labels,pred_labelmmse)
 # accrbf = accuracy_score('acc rbf : ',labels,pred_labelrbf)
 # accpoly = accuracy_score('acc poly : ',labels,pred_labelpoly)
+# print(confusion_matrix(labels,pred_labelpoly))
 # accpoly2 = accuracy_score('acc poly : ',labels,pred_labelpoly2)
 # accpoly4 = accuracy_score('acc poly : ',labels,pred_labelpoly4)
 
@@ -93,20 +108,12 @@ print('poly degree 3 success')
 # print('Poly degree 2 accuracy : ',accpoly2*100)
 # print('Poly degree 4 accuracy : ',accpoly4*100)
 # print(confusion_matrix(labels, pred_label))
-# plt.plot(fpr,tpr,color='red',label='linear')
-# plt.plot(fprmmse,tprmmse,color='blue',label='mmse ')
-# plt.plot(fprrbf,tprrbf,color='c',label='rbf')
-# plt.plot(fprpoly2,tprpoly2,color='m',label='poly degree 11')
-plt.plot(fprpoly,tprpoly,color='green',label='poly degree 90')
-# plt.plot(fprpoly4,tprpoly4,color='y',label='poly degree 13')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.legend()
-plt.show()
+
 
 # print('\n')
 # print('svm rbf accuracy : ',acc2*100)
-# print(confusion_matrix(labels,pred2))
+print(confusion_matrix(labels,pred_labelrbf))
+print(confusion_matrix(labels,pred_labelpoly))
 # tp , fn , fp , tn = np.hstack(confusion_matrix(labels,pred))
 
 

@@ -3,8 +3,6 @@ import numpy as np
 import random
 import math
 import statistics
-import csv
-# import time as timer
 import pandas as pd
 
 Ptdevice = [5*(10**-3),70*(10**-3),150*(10**-3)]
@@ -35,14 +33,15 @@ Fs = 5  # Sampling rate
 Ts = 1.0/Fs # Sampling interval
 time = 100 # Time in graph
 t = np.arange(0,time,Ts) # (start,end,between)
-noise = np.random.normal(0,1,len(t)) # AWGN Noise
+noise = 0 # AWGN Noise
 sig = a*np.sin(2*np.pi*f*t) # Signal Carrier Sine Wave
 
 # Simulation Farm
-sizefarm = 'large' 
-# sizefarm = input("Size farm [normal,large] : ") 
+# sizefarm = 'large' 
+sizefarm = input("Size farm [normal,large] : ") 
 if sizefarm == "normal" or sizefarm == "Normal":
     tree = 700
+    noise = np.random.normal(0,1,len(t))
     countcol = 3
     countrow = 3
     linex = [0,200,200,0,0]
@@ -52,8 +51,8 @@ if sizefarm == "normal" or sizefarm == "Normal":
     coorserverx = [100]
     coorservery = [100]
     ccnormal = plt.Circle((100,100),100,color='blue',fill=False)
-    # fig, ax = plt.subplots()
-    # ax.add_patch(ccnormal)
+    fig, ax = plt.subplots()
+    ax.add_patch(ccnormal)
     #เลื่อนตามแนวแกนตั้ง
     while countrow < 200:
         #เลื่อนตามแนวแกนนอน
@@ -70,6 +69,7 @@ if sizefarm == "normal" or sizefarm == "Normal":
         countcol = 3
 elif sizefarm == "large" or sizefarm == "Large":
     tree = 1500
+    noise = np.random.normal(0,3,len(t))
     countcol = 3
     countrow = 3
     linex = [1,345,345,1,1]
@@ -79,8 +79,8 @@ elif sizefarm == "large" or sizefarm == "Large":
     coorserverx = [173]
     coorservery = [173]
     cclarge = plt.Circle((173,173),100,color='blue',fill=False)
-    # fig, ax = plt.subplots()
-    # ax.add_patch(cclarge)
+    fig, ax = plt.subplots()
+    ax.add_patch(cclarge)
     while countrow < 345:
         while countcol < 345:
             treex.append(countcol)
@@ -130,7 +130,7 @@ for i in range(100):
 # Random Binary Signal
 print('Random Binary : ',end='')
 allsig = []
-amountsignal = 3
+amountsignal = 30
 i = 0
 j = 0
 for s in range(amountsignal):
@@ -188,7 +188,7 @@ for item in allsig:
     for i in range(len(item)):
         h = 1/math.sqrt(2)*(random.randint(1,len(t))+1j*random.randint(1,len(t)))
         z.append(math.sqrt(h.real**2 + h.imag**2))
-        calcomplex.append(item[i]*z[i] + meannoise + meanSNRall + it[i])
+        calcomplex.append(item[i]*z[i] + noise[i] + meanSNRall + it[i])
     complextransig.append(calcomplex)
 print('Success \n')
 
@@ -319,18 +319,18 @@ pd.Series(np.array(allsig).reshape(-1).astype(np.uint8)).to_csv('labels.csv', in
 print('Success \n')
 
 if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefarm == "Normal":
-    # plt.plot(linex,liney,label='Area',color='red')
-    # plt.plot(radiusrangex,radiusrangey,label='WiFi Effective Range',color='blue')
-    # plt.scatter(treex,treey,s=10,label='Tree {} tree'.format(len(treex)),color='green')
-    # plt.scatter(dx,dy,s=10,label='device {} ea'.format((len(dt))*3),color='blue')
-    # plt.scatter(coorserverx,coorservery,s=80,label="Server",color='black')
-    # plt.text(coorserverx[0],coorservery[0]-5,'Server',horizontalalignment='center')
-    # plt.text(coorserverx[0]+50,coorservery[0]-5,'R = 100',horizontalalignment='center')
-    # plt.title('Simulation Farm Size : '+sizefarm,loc='left')
-    # plt.xlabel('Meter')
-    # plt.ylabel('Meter')
-    # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower right',ncol=2, borderaxespad=0.)
-    fig,myplot = plt.subplots(4, 1)
+    plt.plot(linex,liney,label='Area',color='red')
+    plt.plot(radiusrangex,radiusrangey,label='WiFi Effective Range',color='blue')
+    plt.scatter(treex,treey,s=10,label='Tree {} tree'.format(len(treex)),color='green')
+    plt.scatter(dx,dy,s=10,label='device {} ea'.format((len(dt))*3),color='blue')
+    plt.scatter(coorserverx,coorservery,s=80,label="Server",color='black')
+    plt.text(coorserverx[0],coorservery[0]-5,'Server',horizontalalignment='center')
+    plt.text(coorserverx[0]+50,coorservery[0]-5,'R = 100',horizontalalignment='center')
+    plt.title('Simulation Farm Size : '+sizefarm,loc='left')
+    plt.xlabel('Meter')
+    plt.ylabel('Meter')
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower right',ncol=2, borderaxespad=0.)
+    fig,myplot = plt.subplots(2, 1)
     myplot[0].plot(t,allsig[0])
     myplot[0].set_xlabel('Time')
     myplot[0].set_ylabel('Amplitude')
@@ -343,9 +343,9 @@ if sizefarm == "large" or sizefarm == "Large" or sizefarm == "normal" or sizefar
     # myplot[2].set_xlabel('Time')
     # myplot[2].set_ylabel('Amplitude')
 
-    myplot[3].plot(t,complextransigplussir[0])
-    myplot[3].set_xlabel('Time')
-    myplot[3].set_ylabel('Amplitude')
+    # myplot[3].plot(t,complextransigplussir[0])
+    # myplot[3].set_xlabel('Time')
+    # myplot[3].set_ylabel('Amplitude')
     plt.show()
 else:
     print('End Process')
